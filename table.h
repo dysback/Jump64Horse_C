@@ -3,15 +3,13 @@
 
 #define TABLE_SIZE 8
 
-typedef struct STable {
-    int table[TABLE_SIZE + 4][TABLE_SIZE + 4];
-} Table;
+//int table[TABLE_SIZE + 4][TABLE_SIZE + 4];
+void initialize_table(int table[TABLE_SIZE + 4][TABLE_SIZE + 4]);
 
-Table *initialize_table();
 
-int table_jump(Table *, int, int, int);
+int table_jump(int [TABLE_SIZE + 4][TABLE_SIZE + 4], int, int, int);
 
-void table_print(Table *, char *);
-void table_print2(Table *, char *, int);
+void table_print(int [TABLE_SIZE + 4][TABLE_SIZE + 4], char *);
+void table_print2(int [TABLE_SIZE + 4][TABLE_SIZE + 4], char *, int);
 
 #endif
