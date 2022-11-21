@@ -9,5 +9,4 @@
 void logStr(char *value, int severity);
 void logInt(int value, int severity);
 
-
 #endif

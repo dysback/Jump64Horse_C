@@ -3,11 +3,10 @@
 #include <string.h>
 #include "table.h"
 #include "helpers.h"
+
 int moves[8][2] = {{2, 1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {-1, -2}, {1, -2}, {2, -1}};
 
 void initialize_table(int table[TABLE_SIZE + 4][TABLE_SIZE + 4]) {
-    //int table[TABLE_SIZE + 4][TABLE_SIZE + 4];
-
     for(int i = 0; i < TABLE_SIZE + 4; i++) {
         for (int j = 0; j < TABLE_SIZE + 4; j++) {
             table[i][j] = -1;
@@ -17,8 +16,7 @@ void initialize_table(int table[TABLE_SIZE + 4][TABLE_SIZE + 4]) {
         for (int j = 2; j < TABLE_SIZE + 2; j++) {
             table[i][j] = 0;
         }
-    }
- 
+    } 
     table[2][2] = 1;
 }
 
@@ -62,7 +60,6 @@ void table_print(int table[TABLE_SIZE + 4][TABLE_SIZE + 4], char *descr) {
     table_print2(table, descr, 5);
 }
 
-
 int canMove(int table[TABLE_SIZE + 4][TABLE_SIZE + 4], int x, int y, int direction) {
     return !table[x + moves[direction][0]][y + moves[direction][1]];
 }
@@ -74,7 +71,7 @@ void setMove(int table[TABLE_SIZE + 4][TABLE_SIZE + 4], int x, int y, int direct
 int table_jump(int table[TABLE_SIZE + 4][TABLE_SIZE + 4], int x, int y, int move) {
     int lastMove = -1;
     char text[100];
-    //, number[5], number2[5];
+ 
     sprintf(text, "%s %d","Potez: ", move);
     table_print2(table, text, 7);
     if(move >= MOVES) {
