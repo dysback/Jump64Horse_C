@@ -9,10 +9,10 @@
                 "-g",
                 "*.c",
                 "-o",
-                "${fileDirname}/Jump64Horse"
+                "${workspaceFolder}/Jump64Horse"
             ],
             "options": {
-                "cwd": "${fileDirname}"
+                "cwd": "${workspaceFolder}"
             },
             "problemMatcher": [
                 "$gcc"

@@ -1,53 +1,60 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+
 #include "table.h"
 #include "helpers.h"
 
 int moves[8][2] = {{2, 1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {-1, -2}, {1, -2}, {2, -1}};
 
-void initialize_table(int table[TABLE_SIZE + 4][TABLE_SIZE + 4]) {
-    for(int i = 0; i < TABLE_SIZE + 4; i++) {
-        for (int j = 0; j < TABLE_SIZE + 4; j++) {
-            table[i][j] = -1;
+
+void initialize_table(Table *table, int size, int moves, int x, int y) {
+    table->size = size;
+    table->moves = moves;
+    table->max_move = 0;
+
+    for(int i = 0; i < table->size + 4; i++) {
+        for (int j = 0; j < table->size + 4; j++) {
+            table->table[i][j] = -1;
         }
     }
-   for(int i = 2; i < TABLE_SIZE + 2; i++) {
-        for (int j = 2; j < TABLE_SIZE + 2; j++) {
-            table[i][j] = 0;
+   for(int i = 2; i < table->size + 2; i++) {
+        for (int j = 2; j < table->size + 2; j++) {
+            table->table[i][j] = 0;
         }
     } 
-    table[2][2] = 1;
+    table->table[x][y] = 1;
 }
 
-void table_print2(int table[TABLE_SIZE + 4][TABLE_SIZE + 4], char *descr, int severity) {
+void table_print2(Table *table, char *descr, int severity) {
     if(severity <= LOG_LEVEL || *descr == '*') {
         printf("\n%s\n", descr);
         if(severity <= LOG_LEVEL) {
             printf("   x | y      ");
-            for(int i = 0; i < TABLE_SIZE; i++) {
+            for(int i = 0; i < table->size; i++) {
                 printf("%*d", 4, i + 1);
             }
             
             printf("\n-----+-----------");
-            for(int i = 0; i < TABLE_SIZE; i++) {
+            for(int i = 0; i < table->size; i++) {
                 printf("----");
             }
             printf("------+\n");
 
-            for(int i = 0; i < TABLE_SIZE + 4; i++) {
-                if(i > 1 && i < TABLE_SIZE + 2) {
+            for(int i = 0; i < table->size + 4; i++) {
+                if(i > 1 && i < table->size + 2) {
                     printf("%*d |", 4, i - 1);
                 } else {
                     printf("     |");
                 }
-                for (int j = 0; j < TABLE_SIZE + 4; j++) {
-                    printf("%*d",4, table[i][j]);
+                for (int j = 0; j < table->size + 4; j++) {
+                    printf("%*d",4, table->table[i][j]);
                 }
                 printf(" |\n");
             }
             printf("-----+-----------");
-            for(int i = 0; i < TABLE_SIZE; i++) {
+            for(int i = 0; i < table->size; i++) {
                 printf("----");
             }
             printf("------+\n");
@@ -56,39 +63,48 @@ void table_print2(int table[TABLE_SIZE + 4][TABLE_SIZE + 4], char *descr, int se
 
 }
 
-void table_print(int table[TABLE_SIZE + 4][TABLE_SIZE + 4], char *descr) {
+void table_print(Table *table, char *descr) {
     table_print2(table, descr, 5);
 }
 
-int canMove(int table[TABLE_SIZE + 4][TABLE_SIZE + 4], int x, int y, int direction) {
-    return !table[x + moves[direction][0]][y + moves[direction][1]];
+int canMove(Table *table, int x, int y, int direction) {
+    return !table->table[x + moves[direction][0]][y + moves[direction][1]];
 }
 
-void setMove(int table[TABLE_SIZE + 4][TABLE_SIZE + 4], int x, int y, int direction, int value) {
-    table[x + moves[direction][0]][y + moves[direction][1]] = value;
+void setMove(Table *table, int x, int y, int direction, int value) {
+    table->table[x + moves[direction][0]][y + moves[direction][1]] = value;
 }
 
-int table_jump(int table[TABLE_SIZE + 4][TABLE_SIZE + 4], int x, int y, int move) {
+int table_jump(Table *table, int x, int y, int move) {
     int lastMove = -1;
     char text[100];
  
-    sprintf(text, "%s %d","Potez: ", move);
+    sprintf(text, "%s %d","Move: ", move);
     table_print2(table, text, 7);
-    if(move >= MOVES) {
+    if(move >= table->moves) {
         return 1;
     }
 
     for(int i = 0; i < 8; i++) {
+        if(move >= table->max_move) {
+            table->max_move = move;
+            table->max_move_direction = i;
+            struct timespec t1;
+            timespec_get(&t1, TIME_UTC);
+
+            sprintf(text, "Time: %ld Move: %d, direction: %d", t1.tv_sec, move, i);
+            table_print2(table, text, 2);
+        }
         if(canMove(table, x, y, i)) {
             setMove(table, x, y, i, move + 1);
             if(lastMove > -1) {
                 setMove(table, x, y, lastMove, 0);
-                sprintf(text, "%s %d %s %d, %s %d", "Brisanje:", move, "Direction:", i, "Last move,", lastMove);
+                sprintf(text, "%s %d %s %d, %s %d", "Deletion:", move, "Direction:", i, "Last move,", lastMove);
                 table_print2(table, text, 6);
             }
             lastMove = i;
             if(table_jump(table, x + moves[i][0], y + moves[i][1], move + 1)) {
-                table_print(table, "Kraj:");
+                table_print(table, "End:");
                 return 1;
             }
             
@@ -96,7 +112,7 @@ int table_jump(int table[TABLE_SIZE + 4][TABLE_SIZE + 4], int x, int y, int move
     }
     if(lastMove > -1) {
         setMove(table, x, y, lastMove, 0);
-        sprintf(text, "%s %d", "Kraj poteza:", move);
+        sprintf(text, "%s %d", "End of move:", move);
         table_print2(table, text, 6);
     }
     return 0;

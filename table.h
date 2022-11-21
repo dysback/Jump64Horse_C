@@ -3,9 +3,18 @@
 
 #define TABLE_SIZE 8
 
-void initialize_table(int table[TABLE_SIZE + 4][TABLE_SIZE + 4]);
-int table_jump(int [TABLE_SIZE + 4][TABLE_SIZE + 4], int, int, int);
-void table_print(int [TABLE_SIZE + 4][TABLE_SIZE + 4], char *);
-void table_print2(int [TABLE_SIZE + 4][TABLE_SIZE + 4], char *, int);
+typedef struct STable {
+    int table[20][20];
+    int size;
+    int moves;
+    int max_move;
+    int max_move_direction;
+} Table;
+
+void initialize_table(Table *, int, int, int, int);
+int  table_jump(Table *, int, int, int);
+void table_print(Table *, char *);
+void table_print2(Table *, char *, int);
+
 
 #endif
